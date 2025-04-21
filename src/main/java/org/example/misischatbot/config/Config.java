@@ -1,4 +1,4 @@
-package org.example.misischatbot;
+package org.example.misischatbot.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
