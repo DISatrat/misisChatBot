@@ -5,19 +5,18 @@ import org.springframework.context.annotation.Configuration;
 import ru.mail.im.botapi.BotApiClient;
 import ru.mail.im.botapi.BotApiClientController;
 
-import java.io.IOException;
-
 @Configuration
 public class Config {
+
     @Bean
-    public BotApiClientController botApiClientController() {
+    public BotApiClient botApiClient() {
         String token = "001.0362936170.1000994003:1011924349";
-
-        BotApiClient client = new BotApiClient(token);
-        return BotApiClientController.startBot(client);
+        return new BotApiClient(token);
     }
-    public void echo() throws IOException {
 
+    @Bean
+    public BotApiClientController botApiClientController(BotApiClient client) {
+        return BotApiClientController.startBot(client);
     }
 }
 
