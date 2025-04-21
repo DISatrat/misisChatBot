@@ -48,7 +48,24 @@ public class MailingServiceImpl implements MailingService {
         mailing.getUserStats().put(id, stats);
         mailingDAO.save(mailing);
     }
+    @Override
+    public String getStatistics(Long mailingId) {
+        return mailingDAO.findById(mailingId)
+                .map(this::formatStats)
+                .orElse("Рассылка не найдена");
+    }
 
+    @Override
+    public String getAllStatistics() {
+        List<Mailing> mailings = mailingDAO.findAll();
+        if (mailings.isEmpty()) {
+            return "Нет рассылок для отображения";
+        }
+
+        StringBuilder stats = new StringBuilder("Статистика по всем рассылкам:\n\n");
+        mailings.forEach(m -> stats.append(formatStats(m)).append("\n\n"));
+        return stats.toString();
+    }
 
     private String formatStats(Mailing mailing) {
         int totalUsers = mailing.getUserStats().size();
@@ -57,7 +74,7 @@ public class MailingServiceImpl implements MailingService {
 
         return String.format(
                 "Рассылка #%d (%s)\nТекст: %s\nВсего пользователей: %d\n" +
-                        "Отправлено: %d\nДоставлено: %d\nПрочитано: %d",
+                        "Отправлено: %d \nПрочитано: %d",
                 mailing.getId(),
                 mailing.getType() == Mailing.MailingType.ONCE ? "Одноразовая" : "Повторяющаяся",
                 mailing.getText(),

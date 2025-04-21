@@ -178,30 +178,13 @@ public class Handler {
     private void handleStatCommand(String chatId, String text) {
         String[] parts = text.split(" ");
         if (parts.length == 1) {
-            StringBuilder stats = new StringBuilder("📊 Общая статистика:\n\n");
-
-            List<Mailing> allMailings = mailingService.getAll();
-            if (allMailings.isEmpty()) {
-                stats.append("Нет активных рассылок");
-            } else {
-                allMailings.forEach(mailing -> {
-                    stats.append(formatMailingStats(mailing)).append("\n\n");
-                });
-            }
-
-            sendText(chatId, stats.toString());
+            sendText(chatId, mailingService.getAllStatistics());
         } else {
             try {
                 Long id = Long.parseLong(parts[1]);
-                mailingService.getById(id).ifPresentOrElse(
-                        mailing -> {
-                            String detailedStats = formatDetailedStats(mailing);
-                            sendText(chatId, detailedStats);
-                        },
-                        () -> sendText(chatId, "Рассылка с ID " + id + " не найдена")
-                );
+                sendText(chatId, mailingService.getStatistics(id));
             } catch (NumberFormatException e) {
-                sendText(chatId, "❌ Неверный формат ID. Используйте: /stat или /stat [ID_рассылки]");
+                sendText(chatId, "Неверный формат ID");
             }
         }
     }
@@ -251,8 +234,7 @@ public class Handler {
     private String formatMailingShort(Mailing mailing) {
         return String.format("#%d: %s (%s)",
                 mailing.getId(),
-                mailing.getText().length() > 20 ?
-                        mailing.getText().substring(0, 17) + "..." : mailing.getText(),
+                mailing.getText(),
                 mailing.getType() == Mailing.MailingType.ONCE ?
                         "одноразовая" : "повторяющаяся");
     }
@@ -276,7 +258,7 @@ public class Handler {
     private void sendHelp(String chatId) {
         sendText(chatId,
                 "Доступные команды:\n" +
-                        "/create <once/repeat> [дата/cron] <текст> - создать рассылку\n" +
+                        "/create <once/repeat> [дата/cron] <текст> {usrId1,usrId2,...}- создать рассылку\n" +
                         "/get [id] - получить информацию о рассылке(ах)\n" +
                         "/delete <id> - удалить рассылку\n" +
                         "/stat [id] - получить статистику\n" +

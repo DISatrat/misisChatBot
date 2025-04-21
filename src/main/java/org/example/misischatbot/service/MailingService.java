@@ -12,5 +12,6 @@ public interface MailingService {
     Mailing create(Mailing mailing);
     void delete(Long id);
     void readMessage(String id);
-
+    String getStatistics(Long mailingId);
+    String getAllStatistics();
 }
